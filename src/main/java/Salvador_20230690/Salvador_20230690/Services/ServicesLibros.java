@@ -1,6 +1,7 @@
 package Salvador_20230690.Salvador_20230690.Services;
 
 import Salvador_20230690.Salvador_20230690.Entities.EntityLibros;
+import Salvador_20230690.Salvador_20230690.Exception.ExceptionLibroNoRegistrado;
 import Salvador_20230690.Salvador_20230690.Models.DTO.DTOLibros;
 import Salvador_20230690.Salvador_20230690.Repositories.RepositoryLibros;
 import lombok.extern.slf4j.Slf4j;
@@ -35,5 +36,34 @@ public class ServicesLibros {
 
         return dto;
     }
+
+
+    public DTOLibros InsertarLibros(DTOLibros data){
+        if (data == null || data.getTitulo().isEmpty()){
+            throw new IllegalArgumentException("Ningun campo deve estar vacio");
+        }
+        try {
+            EntityLibros entity = convertirAEntity(data);
+            EntityLibros libroGuardado = repo.save(entity);
+            return ConvertirADTO(libroGuardado);
+        }catch (Exception e){
+            log.error("Error al insertar libro" + e.getMessage());
+            throw new ExceptionLibroNoRegistrado("El libro no pudo ser registrado");
+        }
+    }
+
+    public EntityLibros convertirAEntity(DTOLibros data){
+        EntityLibros entity = new EntityLibros();
+
+        entity.setTitulo(data.getTitulo());
+        entity.setIsbn(data.getIsbn());
+        entity.setAño_publicacion(data.getAño_publicacion());
+        entity.setGenero(data.getGenero());
+        entity.setAutor_id(data.getAutor_id());
+
+        return entity;
+    }
+
+
 
 }
