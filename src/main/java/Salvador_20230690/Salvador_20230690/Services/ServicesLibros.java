@@ -1,11 +1,14 @@
 package Salvador_20230690.Salvador_20230690.Services;
 
 import Salvador_20230690.Salvador_20230690.Entities.EntityLibros;
+import Salvador_20230690.Salvador_20230690.Exception.ExceptionLibroNoEncontrado;
 import Salvador_20230690.Salvador_20230690.Exception.ExceptionLibroNoRegistrado;
 import Salvador_20230690.Salvador_20230690.Models.DTO.DTOLibros;
 import Salvador_20230690.Salvador_20230690.Repositories.RepositoryLibros;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -65,5 +68,30 @@ public class ServicesLibros {
     }
 
 
+    public DTOLibros ActualizarLibros(Long id, @Valid DTOLibros json){
+        EntityLibros existente = repo.findById(id).orElseThrow(() -> new ExceptionLibroNoEncontrado("El libro no fue encontrado"));
 
+        existente.setTitulo(json.getTitulo());
+        existente.setIsbn(json.getIsbn());
+        existente.setAño_publicacion(json.getAño_publicacion());
+        existente.setGenero(json.getGenero());
+        existente.setAutor_id(json.getAutor_id());
+
+        EntityLibros LibroActualizado = repo.save(existente);
+        return ConvertirADTO(LibroActualizado);
+    }
+
+    public boolean EliminarLibro(Long id){
+        try {
+            EntityLibros libroExiste = repo.findById(id).orElse(null);
+            if (libroExiste != null){
+                repo.deleteById(id);
+                return true;
+            }else {
+                return false;
+            }
+        }catch (EmptyResultDataAccessException e){
+            throw new EmptyResultDataAccessException("No se encontro el libro con el id: " + id + ". Vuelva a intentarlo", 1);
+        }
+    }
 }
