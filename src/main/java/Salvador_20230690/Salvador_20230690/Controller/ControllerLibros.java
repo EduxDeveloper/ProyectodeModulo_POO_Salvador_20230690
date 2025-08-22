@@ -91,4 +91,9 @@ public class ControllerLibros {
             ));
         }
     }
+
+    @GetMapping("/SearchLibros")
+    public List<DTOLibros>BuscarLibros(String titulo){
+        return service.BuscarLibrosPorTitulo(titulo);
+    }
 }

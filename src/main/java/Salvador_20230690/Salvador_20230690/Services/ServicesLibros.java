@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service @Slf4j
@@ -93,5 +94,15 @@ public class ServicesLibros {
         }catch (EmptyResultDataAccessException e){
             throw new EmptyResultDataAccessException("No se encontro el libro con el id: " + id + ". Vuelva a intentarlo", 1);
         }
+    }
+
+    public List<DTOLibros>BuscarLibrosPorTitulo(String titulo){
+        List<EntityLibros> todosLosLibros = repo.findAll();
+
+        List<EntityLibros> LibrosFiltrados = todosLosLibros.stream().filter(libro->
+                libro.getTitulo().equalsIgnoreCase(titulo)).collect(Collectors.toList()
+        );
+
+        return LibrosFiltrados.stream().map(this::ConvertirADTO).collect(Collectors.toList());
     }
 }
